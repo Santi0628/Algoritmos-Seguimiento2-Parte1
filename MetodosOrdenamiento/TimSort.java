@@ -1,5 +1,7 @@
 package MetodosOrdenamiento;
 
+import Herramientas.Generar;
+
 // Java program to perform TimSort.
 class TimSort {
 

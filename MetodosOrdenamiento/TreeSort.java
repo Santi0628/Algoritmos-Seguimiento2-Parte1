@@ -1,5 +1,7 @@
 package MetodosOrdenamiento;
 
+import Herramientas.Generar;
+
 // Java program to
 // implement Tree Sort
 class TreeSort {
@@ -7,7 +9,7 @@ class TreeSort {
     // Class containing left and
     // right child of current
     // node and key value
-    class Node
+    static class Node
     {
         int key;
         Node left, right;
@@ -69,11 +71,10 @@ class TreeSort {
             inorderRec(root.right);
         }
     }
-    void treeins(int arr[])
+    void treeins(int[] arr)
     {
-        for(int i = 0; i < arr.length; i++)
-        {
-            insert(arr[i]);
+        for (int j : arr) {
+            insert(j);
         }
 
     }
@@ -82,7 +83,7 @@ class TreeSort {
     public static void main(String[] args)
     {
         TreeSort tree = new TreeSort();
-        int[] arreglo= Generar.cargar_arreglo("arreglo_60000000");
+        int[] arreglo= Generar.cargar_arreglo("arreglo_30000000");
 
         long startTime = System.nanoTime(); // Capturing start time
         tree.treeins(arreglo);

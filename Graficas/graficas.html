@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Algoritmos</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.3.0/echarts.min.js"></script>
+    <style>
+        body,
+        html {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
+        header,
+        footer {
+            background-color: #333;
+            color: #fff;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .row {
+            display: flex;
+            flex-wrap: wrap;
+            /* Permite que las columnas se distribuyan en varias filas */
+            padding: 20px;
+        }
+
+        .column {
+            /* Ajusta el ancho de cada columna */
+            width: 48%;
+            /* 48% para las columnas 1 y 3, 52% para las columnas 2 y 4 */
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .column:nth-child(odd) {
+            /* Secciones 1 y 3 */
+            background-color: #f2f2f2;
+        }
+
+        .column:nth-child(even) {
+            /* Secciones 2 y 4 */
+            background-color: #fff;
+            /* Color de fondo opcional */
+        }
+
+        /* Agrega estilos para los contenedores de las gráficas */
+        .chart-container {
+            height: 400px;
+            /* Ajusta la altura según sea necesario */
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1>Representación grafica de los tiempos de ejecución</h1>
+    </header>
+    <div class="row">
+        <div class="column">
+            <h2>Grafica de barras con un tamaño de 40.000.000</h2>
+            <p>En esta primera sección vemos el primer grafico de barras,
+                que representa el tiempo de ejecucion obtenido por cada metodo
+                de ordenamiento usando un arreglo con un tamaño de 40 millones
+                y numeros con 8 digitos, en el (eje x) tenemos el nombre del metodo y
+                en el (eje y) tenemos el tiempo en segundos, es importante
+                aclarar que el metodo de ordenamiento GnomeSort no es que haya tardado
+                100 segundos en ordenar lo que sucede es que se ha puesto un limite de 100 segundos,
+                este limite esta puesto dentro del calculo de tiempos de ejecucion en el algoritmo en Java,
+                ya que este algoritmo es el mas ineficiente de todos, por lo que el tiempo
+                es exageradamente distante con los otros metodos.</p>
+            <!-- Contenedor para la primera gráfica -->
+            <div class="chart-container" id="chart-container1"></div>
+        </div>
+        <div class="column">
+            <h2>Grafica de barras con un tamaño de 30.000.000</h2>
+            <p>En esta segunda sección vemos el segundo grafico de barras,
+                que representa el tiempo de ejecucion obtenido por cada metodo
+                de ordenamiento usando un arreglo con un tamaño de 30 millones
+                y numeros con 8 digitos. en el (eje x) tenemos el nombre del metodo y
+                en el (eje y) tenemos el tiempo en segundos. Para esta grafica tambien
+                aplica la restriccion de los 100 segundos mencionada anteriormente.
+            </p> <!-- Contenedor para la segunda gráfica -->
+            <div class="chart-container" id="chart-container2"></div>
+        </div>
+        <div class="column">
+            <h2>Tabla de resultados</h2>
+            <p>En esta tercera sección vemos una tabla de resultados,
+                que representa el tiempo de ejecucion obtenido por cada metodo
+                de ordenamiento usando los dos arreglos propuestos, facilitando la
+                comparacion entre los tiempos, es interesante como tiempo de ejecucion
+                del algoritmo GnomeSort supera las dos horas en ambos caso, ya que es el mas
+                ineficiente de todos, porque va comparando posicion a posicion y re ordenando,
+                el tiempo tomado para terminar la ejecución nos es desconocido, pero podemos asegurar
+                que tarda mas de 2 horas.</p> <!-- Agregar la imagen -->
+            <img src="recurso1.png" alt="Descripción de la imagen">
+        </div>
+        <div class="column">
+            <h2>Grafica de pastel</h2>
+            <p>Esta grafica representa la informacion de la tabla, tomando unicamente
+                los datos de ejecucion con un tamaño de 40 millones, es decir el 
+                arreglo mas grande.</p>
+            <!-- Contenedor para el gráfico de pastel -->
+            <div class="chart-container" id="pie-chart-container"></div>
+        </div>
+    </div>
+    <footer>
+        <h3>Presentado por: Santiago Garcia Cañas, Sebastian Carmona Tapasco, Nodier Alberto Alzate Solano<br>
+            Universidad del Quindio<br> Analisis de algoritmos<br> 2024</h3>
+    </footer>
+    <script>
+        // Código JavaScript para obtener los datos del archivo utilizando fetch
+        function leerArchivoTxt(ruta) {
+            return fetch(ruta)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('No se pudo cargar el archivo');
+                    }
+                    return response.text();
+                })
+                .then(datos => {
+                    // Dividir los datos por líneas
+                    const lineas = datos.split('\n');
+
+                    // Inicializar las estructuras para almacenar los datos
+                    const estructura1 = [];
+                    const estructura2 = [];
+
+                    let estructuraActual = null; // Variable para rastrear en qué estructura estamos
+
+                    // Iterar sobre cada línea del archivo
+                    for (const linea of lineas) {
+                        // Si la línea está vacía, continuar con la siguiente línea
+                        if (linea.trim() === '') {
+                            continue;
+                        }
+
+                        // Si la línea contiene ':' al final, es un nuevo conjunto de datos
+                        if (linea.endsWith(':')) {
+                            const clave = linea.replace(':', '');
+                            if (clave === '40000000') {
+                                estructuraActual = estructura1;
+                            } else if (clave === '30000000') {
+                                estructuraActual = estructura2;
+                            }
+                            continue;
+                        }
+
+                        // Dividir la línea por ':' para obtener la clave y el valor
+                        const [clave, valor] = linea.split(':').map(item => item.trim());
+
+                        // Almacenar la clave y el valor en la estructura actual
+                        estructuraActual.push({ clave: clave, valor: parseFloat(valor) });
+                    }
+
+                    // Ordenar las estructuras por valor (orden descendente)
+                    estructura1.sort((a, b) => {
+                        if (a.valor !== b.valor) {
+                            return b.valor - a.valor;
+                        } else {
+                            // Si los valores son iguales, ordenar alfabéticamente por clave
+                            return a.clave.localeCompare(b.clave);
+                        }
+                    });
+
+                    estructura2.sort((a, b) => {
+                        if (a.valor !== b.valor) {
+                            return b.valor - a.valor;
+                        } else {
+                            // Si los valores son iguales, ordenar alfabéticamente por clave
+                            return a.clave.localeCompare(b.clave);
+                        }
+                    });
+
+                    return [estructura1, estructura2];
+                })
+                .catch(error => {
+                    console.error('Error al cargar el archivo:', error);
+                });
+        }
+
+        // Ruta del archivo
+        const ruta = '../resultados/resultadosOrdenados.txt';
+
+        // Mapeo de nombres para los números de la estructura
+        const nombres = {
+            '1': 'TimSort',
+            '2': 'CombSort',
+            '3': 'TreeSort',
+            '4': 'PigeonholeSort',
+            '5': 'HeapSort',
+            '6': 'BitonicSort',
+            '7': 'GnomeSort'
+        };
+
+        // Llamar a la función para leer el archivo y obtener las estructuras
+        leerArchivoTxt(ruta)
+            .then(([estructura1, estructura2]) => {
+                // El código JavaScript para configurar y mostrar el primer gráfico
+                var option1 = {
+                    xAxis: {
+                        type: 'category',
+                        axisLabel: {
+                            rotate: 45 // Rota los nombres del eje X 45 grados
+                        },
+                        // Modificar los datos del eje X con los valores proporcionados por la función JavaScript
+                        data: estructura1.map(function (item) {
+                            return nombres[item.clave];
+                        })
+                    },
+                    yAxis: {
+                        type: 'value'
+                    },
+                    series: [{
+                        // Modificar los datos de la serie con los valores de estructura1
+                        data: estructura1.map(function (item) { return item.valor; }),
+                        type: 'bar',
+                        barWidth: '50%', // Puedes ajustar este valor según sea necesario
+                        showBackground: true,
+                        backgroundStyle: {
+                            color: 'rgba(180, 180, 180, 0.2)'
+                        }
+                    }]
+                };
+
+                // Obtén el contenedor del primer gráfico
+                var chartContainer1 = document.getElementById('chart-container1');
+                // Crea un objeto ECharts y pasa el contenedor
+                var myChart1 = echarts.init(chartContainer1);
+                // Configura las opciones del gráfico y renderízalo
+                myChart1.setOption(option1);
+
+                // El código JavaScript para configurar y mostrar el segundo gráfico
+                var option2 = {
+                    xAxis: {
+                        type: 'category',
+                        axisLabel: {
+                            rotate: 45 // Rota los nombres del eje X 45 grados
+                        },
+                        // Modificar los datos del eje X con los valores proporcionados por la función JavaScript
+                        data: estructura2.map(function (item) {
+                            return nombres[item.clave];
+                        })
+                    },
+                    yAxis: {
+                        type: 'value'
+                    },
+                    series: [{
+                        // Modificar los datos de la serie con los valores de estructura2
+                        data: estructura2.map(function (item) { return item.valor; }),
+                        type: 'bar',
+                        barWidth: '50%', // Puedes ajustar este valor según sea necesario
+                        showBackground: true,
+                        backgroundStyle: {
+                            color: 'rgba(180, 180, 180, 0.2)'
+                        }
+                    }]
+                };
+
+                // Obtén el contenedor del segundo gráfico
+                var chartContainer2 = document.getElementById('chart-container2');
+                // Crea un objeto ECharts y pasa el contenedor
+                var myChart2 = echarts.init(chartContainer2);
+                // Configura las opciones del gráfico y renderízalo
+                myChart2.setOption(option2);
+            });
+
+        leerArchivoTxt(ruta)
+            .then(([estructura1, estructura2]) => {
+                // El código para configurar y mostrar los primeros dos gráficos aquí...
+
+                // Configurar el gráfico de pastel con los datos de estructura1
+                var pieOption = {
+                    tooltip: {
+                        trigger: 'item'
+                    },
+                    legend: {
+                        top: '5%',
+                        left: 'center'
+                    },
+                    series: [{
+                        name: 'Access From',
+                        type: 'pie',
+                        radius: ['40%', '70%'],
+                        avoidLabelOverlap: false,
+                        padAngle: 5,
+                        itemStyle: {
+                            borderRadius: 10
+                        },
+                        label: {
+                            show: false,
+                            position: 'center'
+                        },
+                        emphasis: {
+                            label: {
+                                show: true,
+                                fontSize: 12,
+                                fontWeight: 'bold'
+                            }
+                        },
+                        labelLine: {
+                            show: false
+                        },
+                        data: estructura1.map(function (item) {
+                            return {
+                                value: item.valor,
+                                name: item.clave
+                            };
+                        })
+                    }]
+                };
+
+                // Obtén el contenedor del gráfico de pastel
+                var pieChartContainer = document.getElementById('pie-chart-container');
+                // Crea un objeto ECharts y pasa el contenedor
+                var pieChart = echarts.init(pieChartContainer);
+                // Configura las opciones del gráfico de pastel y renderízalo
+                pieChart.setOption(pieOption);
+            });
+
+        // Obtén el contenedor del gráfico de pastel
+        var pieChartContainer = document.getElementById('pie-chart-container');
+        // Crea un objeto ECharts y pasa el contenedor
+        var pieChart = echarts.init(pieChartContainer);
+        // Configura las opciones del gráfico de pastel y renderízalo
+        pieChart.setOption(pieOption);
+    </script>
+</body>
+
+</html>

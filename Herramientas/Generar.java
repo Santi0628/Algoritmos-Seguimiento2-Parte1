@@ -1,4 +1,4 @@
-package MetodosOrdenamiento;
+package Herramientas;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -8,12 +8,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+/**
+ * Esta clase se usa como herramienta para crear los casos
+ */
 public class Generar 
 {
    
     public static void main(String[] args) 
     {
-         int[] casos = {40000000, 50000000};
+         int[] casos = {40000000, 30000000};
 
          for (int i : casos)
          {
